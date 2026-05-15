@@ -19,13 +19,14 @@ jobs:
 
       - name: Build y Push Backend
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/innovatech-backend:latest ./Devopss/backend
+          # Usamos ./backend porque la carpeta está en la raíz de tu GitHub
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/innovatech-backend:latest ./backend
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/innovatech-backend:latest
 
       - name: Build y Push Frontend
         run: |
-          # CORRECCIÓN: FRONTEND debe ir en MAYÚSCULAS para coincidir con tu carpeta
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/innovatech-frontend:latest ./Devopss/FRONTEND
+          # Usamos ./FRONTEND en mayúsculas para que coincida con tu repo
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/innovatech-frontend:latest ./FRONTEND
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/innovatech-frontend:latest
 
   deploy:
@@ -42,6 +43,6 @@ jobs:
             cd /home/ubuntu/
             if [ ! -d "proyecto" ]; then mkdir proyecto; fi
             cd proyecto
-            # Recuerda subir tu archivo docker-compose.yml a esta carpeta en el servidor
+            # Asegúrate de que docker-compose.yml esté en esta carpeta del servidor
             sudo docker compose pull
             sudo docker compose up -d
