@@ -1,15 +1,35 @@
 version: '3.8'
 
 services:
-  api-service:
-    build: ./backend 
+  # 1. AGREGAMOS EL SERVICIO DE BASE DE DATOS
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password # Cambia esto si usas otra en tu código
+      MYSQL_DATABASE: innovatech_ops
     ports:
-      - "3001:3001"
+      - "3306:3306"
+    networks:
+      - innovatech-net
+
+  api-service:
+    image: luisxxredx/innovatech-backend:latest # Usamos la imagen de Docker Hub
+    ports:
+      - "3000:3001" # Mapeamos el 3000 de AWS al 3001 de tu código
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db  # IMPORTANTE: El nombre del servicio de arriba
+      - DB_PORT=3306
+      - DB_NAME=innovatech_ops
+      - DB_USER=root
+      - DB_PASSWORD=root_password
+      - PORT=3001
     networks:
       - innovatech-net
 
   web-service:
-    build: ./frontend 
+    image: luisxxredx/innovatech-frontend:latest
     ports:
       - "80:80"
     networks:
