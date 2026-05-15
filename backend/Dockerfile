@@ -1,15 +1,20 @@
+# 1. Usamos una imagen ligera de Node.js
+FROM node:18-alpine
 
-FROM node:18-alpine AS build
+# 2. Creamos el directorio de trabajo
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
 
-FROM nginx:stable-alpine
-RUN touch /var/run/nginx.pid && \
-    chown -R nginx:nginx /var/run/nginx.pid /var/cache/nginx /var/log/nginx /etc/nginx/conf.d
-USER nginx
-COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# 3. Copiamos solo los archivos de dependencias para aprovechar la caché
+COPY package*.json ./
+
+# 4. Instalamos las dependencias
+RUN npm install
+
+# 5. Copiamos el resto del código (incluyendo index.js)
+COPY . .
+
+# 6. Exponemos el puerto que usa tu API (verifica si es el 3000 o 5000)
+EXPOSE 3000
+
+# 7. Comando para arrancar la aplicación
+CMD ["node", "index.js"]
