@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 3000
 
 # 7. EJECUTAR EL ARCHIVO CORRECTO (src/server.js)
-CMD ["node", "src/app.js"]
+CMD ["node", "src/server.js"]
