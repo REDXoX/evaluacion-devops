@@ -1,20 +1,20 @@
-# 1. Usamos una imagen ligera de Node.js
+# 1. Imagen base de Node
 FROM node:18-alpine
 
-# 2. Creamos el directorio de trabajo
+# 2. Directorio de trabajo
 WORKDIR /app
 
-# 3. Copiamos solo los archivos de dependencias para aprovechar la caché
+# 3. Copiar archivos de dependencias
 COPY package*.json ./
 
-# 4. Instalamos las dependencias
+# 4. Instalar librerías
 RUN npm install
 
-# 5. Copiamos el resto del código (incluyendo index.js)
+# 5. Copiar todo el código (incluyendo la carpeta src)
 COPY . .
 
-# 6. Exponemos el puerto que usa tu API (verifica si es el 3000 o 5000)
+# 6. Exponer el puerto del backend
 EXPOSE 3000
 
-# 7. Comando para arrancar la aplicación
-CMD ["node", "index.js"]
+# 7. EJECUTAR EL ARCHIVO CORRECTO (src/server.js)
+CMD ["node", "src/server.js"]
