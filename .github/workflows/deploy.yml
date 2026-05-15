@@ -2,10 +2,9 @@ name: CI/CD Innovatech
 
 on:
   push:
-    [cite_start]branches: [ "deploy" ] 
+    branches: [ "main" ] # Cambiado a main para que coincida con tu repositorio
 
 jobs:
-
   build-and-push:
     runs-on: ubuntu-latest
     steps:
@@ -15,7 +14,7 @@ jobs:
       - name: Login en Docker Hub
         uses: docker/login-action@v2
         with:
-          [cite_start]username: ${{ secrets.DOCKERHUB_USERNAME }} 
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build y Push Backend
@@ -35,11 +34,14 @@ jobs:
       - name: Despliegue vía SSH
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
+          host: ${{ secrets.HOST_DNS }} # Usando el nombre que ya tienes en tus secrets
+          username: ubuntu # Cambiado de ec2-user a ubuntu porque tu imagen es Ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Comandos que se ejecutan dentro de tu AWS EC2 [cite: 42, 112]
-            cd /home/ec2-user/proyecto
-            docker-compose pull
-            docker-compose up -d
+            # Comandos para tu servidor Ubuntu
+            cd /home/ubuntu/
+            if [ ! -d "proyecto" ]; then mkdir proyecto; fi
+            cd proyecto
+            # Aquí deberías tener tu archivo docker-compose.yml
+            sudo docker-compose pull
+            sudo docker-compose up -d
