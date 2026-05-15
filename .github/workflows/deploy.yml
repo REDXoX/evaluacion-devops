@@ -1,48 +1,44 @@
-name: CI/CD Innovatech
+name: Deploy Innovatech Stack
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - deploy
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout del código
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Login en Docker Hub
-        uses: docker/login-action@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build y Push Backend
+      - name: Build and Push Backend
         run: |
-          # Usamos ./backend porque la carpeta está en la raíz de tu GitHub
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/innovatech-backend:latest ./backend
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/innovatech-backend:latest
 
-      - name: Build y Push Frontend
+      - name: Build and Push Frontend
         run: |
-          # Usamos ./FRONTEND en mayúsculas para que coincida con tu repo
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/innovatech-frontend:latest ./FRONTEND
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/innovatech-frontend:latest ./frontend
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/innovatech-frontend:latest
 
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - name: Despliegue vía SSH
-        uses: appleboy/ssh-action@master
+      - name: SSH and Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.HOST_DNS }}
-          username: ubuntu
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/ubuntu/
-            if [ ! -d "proyecto" ]; then mkdir proyecto; fi
-            cd proyecto
-            # Asegúrate de que docker-compose.yml esté en esta carpeta del servidor
-            sudo docker compose pull
-            sudo docker compose up -d
+            cd ~/proyecto
+            docker-compose pull
+            docker-compose up -d
