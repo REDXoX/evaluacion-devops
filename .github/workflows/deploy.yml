@@ -25,6 +25,7 @@ jobs:
 
       - name: Build and Push Frontend
         run: |
+          # Usamos ./frontend tal como aparece en tu imagen
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/innovatech-frontend:latest ./frontend
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/innovatech-frontend:latest
 
@@ -36,9 +37,10 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
+          username: ubuntu  # Usuario correcto para instancias Ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            # Asegúrate de que esta carpeta exista en tu EC2
             cd ~/proyecto
-            docker-compose pull
-            docker-compose up -d
+            sudo docker compose pull
+            sudo docker compose up -d
