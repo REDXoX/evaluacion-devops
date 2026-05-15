@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  api-service:
+    build: ./backend 
+    ports:
+      - "3001:3001"
+    networks:
+      - innovatech-net
+
+  web-service:
+    build: ./frontend 
+    ports:
+      - "80:80"
+    networks:
+      - innovatech-net
+    depends_on:
+      - api-service
+
+networks:
+  innovatech-net:
+    driver: bridge
