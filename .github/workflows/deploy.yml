@@ -2,7 +2,7 @@ name: CI/CD Innovatech
 
 on:
   push:
-    branches: [ "main" ] # Cambiado a main para que coincida con tu repositorio
+    branches: [ "main" ]
 
 jobs:
   build-and-push:
@@ -19,14 +19,13 @@ jobs:
 
       - name: Build y Push Backend
         run: |
-          # Se agrega Devopss/ antes de /backend porque ahí están tus archivos
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/innovatech-backend:latest ./Devopss/backend
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/innovatech-backend:latest
 
       - name: Build y Push Frontend
         run: |
-          # Se agrega Devopss/ antes de /frontend
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/innovatech-frontend:latest ./Devopss/frontend
+          # CORRECCIÓN: FRONTEND debe ir en MAYÚSCULAS para coincidir con tu carpeta
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/innovatech-frontend:latest ./Devopss/FRONTEND
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/innovatech-frontend:latest
 
   deploy:
@@ -36,14 +35,13 @@ jobs:
       - name: Despliegue vía SSH
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST_DNS }} # Usando el nombre que ya tienes en tus secrets
-          username: ubuntu # Cambiado de ec2-user a ubuntu porque tu imagen es Ubuntu
+          host: ${{ secrets.HOST_DNS }}
+          username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Comandos para tu servidor Ubuntu
             cd /home/ubuntu/
             if [ ! -d "proyecto" ]; then mkdir proyecto; fi
             cd proyecto
-            # Aquí deberías tener tu archivo docker-compose.yml
-            sudo docker-compose pull
-            sudo docker-compose up -d
+            # Recuerda subir tu archivo docker-compose.yml a esta carpeta en el servidor
+            sudo docker compose pull
+            sudo docker compose up -d
